@@ -1,0 +1,20 @@
+{
+  "name": "dockerzin",
+  "module": "index.mjs",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "bun run scripts/start-artifact.mjs",
+    "delete": "bun run scripts/delete-artifact.mjs",
+    "kabum": "bun run scripts/delete-artifact.mjs --all"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^8.2.0"
+  }
+}
