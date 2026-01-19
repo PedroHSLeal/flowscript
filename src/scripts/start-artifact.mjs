@@ -1,11 +1,12 @@
 import { $ } from "bun";
-import { fetchDockerHubImageRegistry, selectRegistry, pullImageFromDockerHub } from "../modules/docker-hub";
-import { args, checkIfArtifactExists } from "../utils";
+import { args, checkIfArtifactExists, useDockerHub } from "../utils";
+
+const { fetchDockerHubImageRegistry, selectRegistry, pullImageFromDockerHub } = useDockerHub();
 
 await main();
 
 async function main() {
-	const { values, positionals } = args({
+	const { values } = args({
 			shortcut: { type: "string" },
 			dockerfile: { type: "boolean" },
 			edit: { type: "boolean" },
@@ -26,7 +27,7 @@ async function main() {
 
 		await pullImageFromDockerHub(imageName);
 	}
-	
+
 	await execute(values);
 }
 
@@ -39,18 +40,19 @@ async function checkIfPodmanIsOn() {
 }
 
 async function execute({ shortcut, dockerfile }) {
-	const outputList = await $`ls -l $(pwd)\\shortcuts`.text();
+	const outputList = await $`ls -l $(pwd)\\src\\shortcuts`.text();
 
 	if (!outputList.includes(shortcut)) {
 		console.log(`o shortcut '${shortcut}' nao existe :(`);
 		console.log(`vou criar agora!`);
 
-		await $`mkdir $(pwd)\\shortcuts\\${shortcut}`;
-		await $`touch $(pwd)\\shortcuts\\${shortcut}\\index.mjs`;
+		await $`mkdir $(pwd)\\src\\shortcuts\\${shortcut}`;
+		await $`touch $(pwd)\\src\\shortcuts\\${shortcut}\\index.mjs`;
 
-		if (values.dockerfile)
-			await $`touch $(pwd)\\shortcuts\\${shortcut}\\Dockerfile`;
+		if (dockerfile)
+			await $`touch $(pwd)\\src\\shortcuts\\${shortcut}\\Dockerfile`;
 	}
 
-	await $`bun $(pwd)\\shortcuts\\${shortcut}\\index.mjs`;
+	await $`bun $(pwd)\\src\\shortcuts\\${shortcut}\\index.mjs`;
+  Bun.spawn(["bun", `${process.cwd()}\\src\\shortcuts\\${shortcut}\\index.mjs`], { detached: true, stdio: ["inherit", "inherit", "inherit"] })
 }

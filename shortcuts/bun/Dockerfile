@@ -1,3 +1,0 @@
-FROM oven/bun
-
-RUN 

@@ -1,7 +1,8 @@
 import { $ } from "bun";
 import { confirm } from "@inquirer/prompts";
-import { checkIfDockerfileExists } from "../../modules/dockerfile";
-import { checkIfArtifactExists } from "../../utils";
+import { checkIfArtifactExists, useDockerfile } from "../../utils";
+
+const { checkIfDockerfileExists } = useDockerfile();
 
 $.nothrow();
 $.cwd(import.meta.dir);

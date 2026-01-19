@@ -4,9 +4,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "bun run scripts/start-artifact.mjs",
-    "delete": "bun run scripts/delete-artifact.mjs",
-    "kabum": "bun run scripts/delete-artifact.mjs --all"
+    "start": "bun run src/scripts/start-artifact.mjs",
+    "delete": "bun run src/scripts/delete-artifact.mjs",
+    "kabum": "bun run src/scripts/delete-artifact.mjs --all",
+    "test": "bun run src/scripts/test.mjs"
   },
   "devDependencies": {
     "@types/bun": "latest"
