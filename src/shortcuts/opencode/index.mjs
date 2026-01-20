@@ -1,10 +1,10 @@
 import { $ } from "bun";
 import { confirm } from "@inquirer/prompts";
-import { useDockerfile } from "../../utils";
+import { execInteractiveAndTtyCommand, useDockerfile } from "../../utils";
 
 const { checkIfDockerfileExists } = useDockerfile();
 
-// $.nothrow();
+$.nothrow();
 $.cwd(import.meta.dir);
 
 const dockerfileExists = await checkIfDockerfileExists(`${import.meta.dir}\\Dockerfile`);
@@ -16,6 +16,6 @@ if (dockerfileExists) {
   const answerToBuild = await confirm({ message: "quer buildar o Dockerfile?: " });
   if (answerToBuild) {
     await $`podman build --tag irezin/opencode .`;
-    await $`podman run --interactive --tty --network intelligence irezin/opencode`
+    await execInteractiveAndTtyCommand("opencode", "podman run --interactive --tty --network intelligence irezin/opencode");
   }
 }

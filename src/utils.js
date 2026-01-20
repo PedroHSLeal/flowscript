@@ -1,6 +1,7 @@
 import { $ } from "bun";
 import { parseArgs } from "util";
 import { select } from "@inquirer/prompts";
+import { exec, execFile, spawn } from "node:child_process";
 
 export function useDockerHub() {
 	async function fetchDockerHubImageRegistry(shortcut) {
@@ -55,4 +56,23 @@ export function args(flags) {
 		strict: true,
 		allowPositionals: true,
 	});
+}
+
+export async function execInteractiveAndTtyCommand(terminalName, command) {
+  const fullCommand = "wt"
+    + " new-tab"
+    + " --maximized"
+    + " --focus"
+    + ` --title=${terminalName}`
+    + ` --profile="Command Prompt"`
+    + ` --appendCommandLine " /k ${command}"`;
+
+  const options = {
+    shell: true,
+    detached: true,
+    windowsVerbatimArguments: true,
+    stdio: "ignore"
+  };
+
+  spawn(fullCommand, options);
 }

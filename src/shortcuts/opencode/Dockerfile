@@ -1,7 +1,9 @@
-FROM anomalyco/opencode:1.1.24
+FROM anomalyco/opencode
 COPY opencode.json ./
 
+# just for tests
 # RUN apk add curl
 
-# ENTRYPOINT ["opencode"]
-ENTRYPOINT ["/bin/sh"]
+# ENTRYPOINT ["/bin/sh"]
+
+ENTRYPOINT ["opencode"]
