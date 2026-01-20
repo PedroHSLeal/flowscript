@@ -54,5 +54,5 @@ async function execute({ shortcut, dockerfile }) {
 	}
 
 	await $`bun $(pwd)\\src\\shortcuts\\${shortcut}\\index.mjs`;
-  Bun.spawn(["bun", `${process.cwd()}\\src\\shortcuts\\${shortcut}\\index.mjs`], { detached: true, stdio: ["inherit", "inherit", "inherit"] })
+  // Bun.spawn(["bun", `${process.cwd()}\\src\\shortcuts\\${shortcut}\\index.mjs`], { detached: false, stdio: ["inherit", "inherit", "inherit"] })
 }
