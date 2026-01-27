@@ -27,7 +27,7 @@ async function runSimpleCommand() {
 		+ " --gpus all"
 		+ " --volume ollama:/root/.ollama"
 		+ " --publish 11434:11434"
-		+ " --env OLLAMA_CONTEXT_LENGTH=32768"
+		+ " --env OLLAMA_CONTEXT_LENGTH=65536"
 		+ " --network intelligence"
 		+ " --name ollama"
 		+ " ollama/ollama";
@@ -35,7 +35,6 @@ async function runSimpleCommand() {
 	const { exitCode } = await $`podman run ${{ raw: args }}`;
 
 	if (exitCode !== 0) {
-		console.log("rodando container...");
 		await $`podman container start ollama`;
 	}
 }

@@ -53,8 +53,10 @@ export function args(flags) {
 	return parseArgs({
 		args: Bun.argv,
 		options: flags,
-		strict: true,
+		strict: false,
+    allowNegative: true,
 		allowPositionals: true,
+    tokens: true
 	});
 }
 

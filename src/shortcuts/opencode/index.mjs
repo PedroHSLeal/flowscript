@@ -14,8 +14,14 @@ if (dockerfileExists) {
   if (answerToEdit) await $`vim Dockerfile`;
 
   const answerToBuild = await confirm({ message: "quer buildar o Dockerfile?: " });
-  if (answerToBuild) {
-    await $`podman build --tag irezin/opencode .`;
-    await execInteractiveAndTtyCommand("opencode", "podman run --interactive --tty --network intelligence irezin/opencode");
-  }
+  if (answerToBuild) await $`podman build --tag irezin/opencode .`;
+
+  const command = "podman"
+    + " run"
+    + " --interactive"
+    + " --tty"
+    + " --network intelligence"
+    + " irezin/opencode";
+
+  await execInteractiveAndTtyCommand("opencode", command);
 }
