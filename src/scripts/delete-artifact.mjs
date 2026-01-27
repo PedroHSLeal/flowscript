@@ -5,7 +5,8 @@ $.nothrow();
 
 const { values } = args({
 	shortcut: { type: "string" },
-	all: { type: "boolean" }
+	all: { type: "boolean" },
+  workDir: { type: "string" }
 });
 
 if (values.all) {

@@ -1,4 +1,5 @@
-import { $ } from "bun";
+import { args } from "../utils";
 
-// await $`cmd /k .\\src\\scripts\\seila.cmd`
-Bun.spawn(["cmd", "/k .\\src\\scripts\\seila.cmd"], {detached: true})
+const passedArgs = args({ workDir: { type: "string" }});
+
+console.log(passedArgs);
