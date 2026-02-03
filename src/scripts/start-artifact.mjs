@@ -1,7 +1,10 @@
 import { $ } from "bun";
-import { args, checkIfArtifactExists, useDockerHub } from "../utils";
+import { args, checkIfArtifactExists, useDockerHub, usePodmanMachine } from "../utils";
+
+import shEntrypoint from "./ssh-entrypoint.sh" with { type: "text" };
 
 const { fetchDockerHubImageRegistry, selectRegistry, pullImageFromDockerHub } = useDockerHub();
+const { execScriptFile } = usePodmanMachine();
 
 await main();
 
@@ -28,6 +31,8 @@ async function main() {
 
     await pullImageFromDockerHub(imageName);
   }
+
+  await execScriptFile(shEntrypoint);
 
   execute(values).then(() => {
     const subprocess = Bun.spawn(["bun", `${process.cwd()}\\src\\shortcuts\\${values.shortcut}\\index.mjs`], {

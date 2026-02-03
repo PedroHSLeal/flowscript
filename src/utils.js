@@ -44,6 +44,22 @@ export function useDockerfile() {
 	}
 }
 
+export function usePodmanMachine() {
+  async function execScriptFile(shFile) {
+    let inlineCommands = shFile.split("\n").map(l => l.trim()).filter(l => l.length > 0).filter(l => !l.startsWith("#")).join(" ");
+    return await $`podman machine ssh '${inlineCommands}'`;
+  }
+
+  async function execInlineCommand(command) {
+    return await $`podman machine ssh '${command}'`;
+  }
+
+  return {
+    execScriptFile,
+    execInlineCommand
+  }
+}
+
 export async function checkIfArtifactExists(artifact, shortcut) {
 	const artifactList = await $`podman ${artifact} list`.text();
 	return artifactList.includes(shortcut);

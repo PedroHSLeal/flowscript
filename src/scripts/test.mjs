@@ -1,5 +1,7 @@
 import { $ } from "bun";
 import { exec, execFile, spawn } from "node:child_process";
+import entrypoint from "./ssh-entrypoint.sh" with { type: "text" };
+import { usePodmanMachine } from "../utils";
 
 // await $`cmd /k .\\src\\scripts\\seila.cmd`
 // aqui abre o terminal, mantem aberto e executa o arquivo
@@ -18,3 +20,6 @@ import { exec, execFile, spawn } from "node:child_process";
 // spawn("%USERPROFILE%\\fun\\commands\\apps\\dockerzin\\src\\scripts\\seila", { shell: true, detached: true, stdio: "inherit" })
 
 // Bun.spawn(["podman", "run", "--attach=stdout", "-it", "opencode"], { detached: true });
+
+const { execScriptFile } = usePodmanMachine();
+await execScriptFile(entrypoint);
