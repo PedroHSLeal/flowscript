@@ -10,8 +10,8 @@ await main();
 
 async function main() {
   const { values } = args({
-    shortcut: { type: "string" },
-    dockerfile: { type: "boolean" },
+    shortcut: { type: "string", short: "s" },
+    dockerfile: { type: "boolean", short: "d" },
     edit: { type: "boolean" },
     cwd: { type: "string" }
   });
