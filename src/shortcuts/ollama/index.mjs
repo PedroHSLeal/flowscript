@@ -1,40 +1,29 @@
 import { $ } from "bun";
-import { confirm } from "@inquirer/prompts";
-import { checkIfArtifactExists, useDockerfile } from "../../utils";
-
-const { checkIfDockerfileExists } = useDockerfile();
+import { checkIfArtifactExists } from "../../utils";
 
 $.nothrow();
 $.cwd(import.meta.dir);
 
-const dockerfileExists = await checkIfDockerfileExists(`${import.meta.dir}\\Dockerfile`);
+process.on("message", async (flags) => {
+  await runSimpleCommand();
 
-if (dockerfileExists) {
-	const answerToEdit = await confirm({ message: "quer editar o Dockerfile?: " });
-	if (answerToEdit) await $`vim Dockerfile`;
+  async function runSimpleCommand() {
+    const containerRunning = checkIfArtifactExists("container", "ollama");
+    if (!containerRunning) return;
 
-	const answerToBuild = await confirm({ message: "quer buildar o Dockerfile?: " });
-	if (answerToBuild) {}
-	else runSimpleCommand();
-}
-else await runSimpleCommand();
+    const args = " --detach"
+      + " --gpus all"
+      + " --volume ollama:/root/.ollama"
+      + " --publish 11434:11434"
+      + " --env OLLAMA_CONTEXT_LENGTH=65536"
+      + " --network intelligence"
+      + " --name ollama"
+      + " ollama/ollama";
 
-async function runSimpleCommand() {
-	const containerRunning = checkIfArtifactExists("container", "ollama");
-	if (!containerRunning) return;
+    const { exitCode } = await $`podman run ${{ raw: args }}`.quiet();
 
-	const args = " --detach"
-		+ " --gpus all"
-		+ " --volume ollama:/root/.ollama"
-		+ " --publish 11434:11434"
-		+ " --env OLLAMA_CONTEXT_LENGTH=65536"
-		+ " --network intelligence"
-		+ " --name ollama"
-		+ " ollama/ollama";
-
-	const { exitCode } = await $`podman run ${{ raw: args }}`;
-
-	if (exitCode !== 0) {
-		await $`podman container start ollama`;
-	}
-}
+    if (exitCode !== 0) {
+      await $`podman container start ollama`;
+    }
+  }
+});
