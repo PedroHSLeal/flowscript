@@ -10,7 +10,7 @@ async function main() {
     shortcut: { type: "string" },
     dockerfile: { type: "boolean" },
     edit: { type: "boolean" },
-    workDir: { type: "string" }
+    cwd: { type: "string" }
   });
 
   if (!values.shortcut) {
@@ -34,7 +34,7 @@ async function main() {
       ipc: (message, subprocess, handle) => {
       },
       // windowsHide: true,
-      detached: true,
+      detached: false,
       stdio: ["inherit", "inherit", "inherit"]
     });
 

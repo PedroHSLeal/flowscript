@@ -1,7 +1,7 @@
 import { $ } from "bun";
 import { parseArgs } from "util";
 import { select } from "@inquirer/prompts";
-import { exec, execFile, spawn } from "node:child_process";
+import { spawn } from "node:child_process";
 
 export function useDockerHub() {
 	async function fetchDockerHubImageRegistry(shortcut) {
