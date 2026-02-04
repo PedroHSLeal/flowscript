@@ -35,6 +35,7 @@ process.on("message", async function (flags) {
     + " run"
     + " --interactive"
     + " --tty"
+    + " --env OPENCODE_CONFIG=/opencode.json"
     + " --network intelligence"
     + ` --mount type=bind,src=${flags.cwd},dst=/home`
     + ` ${appName}`;
