@@ -45,13 +45,13 @@ export function useDockerfile() {
 }
 
 export function usePodmanMachine() {
-  async function execScriptFile(shFile) {
+  async function execScriptFile(shFile, isQuiet = true) {
     let inlineCommands = shFile.split("\n").map(l => l.trim()).filter(l => l.length > 0).filter(l => !l.startsWith("#")).join(" ");
-    return await $`podman machine ssh '${inlineCommands}'`;
+    return $`podman machine ssh '${inlineCommands}'`.quiet(isQuiet);
   }
 
-  async function execInlineCommand(command) {
-    return await $`podman machine ssh '${command}'`;
+  async function execInlineCommand(command, isQuiet = true) {
+    return $`podman machine ssh '${command}'`.quiet(isQuiet);
   }
 
   return {

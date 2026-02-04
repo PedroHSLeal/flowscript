@@ -42,6 +42,9 @@ async function main() {
     });
 
     subprocess.send(values);
+    await subprocess.exited;
+
+    subprocess.disconnect();
   });
 }
 
