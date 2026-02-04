@@ -38,6 +38,6 @@ process.on("message", async function (flags) {
   const subProc = await execInteractiveCommand(command);
   await subProc.exited;
 
-  return;
+  process.disconnect();
 });
 
