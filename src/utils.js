@@ -76,21 +76,13 @@ export function args(flags) {
   });
 }
 
-export async function execInteractiveAndTtyCommand(terminalName, command) {
-  const fullCommand = "wt"
-    + " new-tab"
-    + " --maximized"
-    + " --focus"
-    + ` --title=${terminalName}`
-    + ` --profile="Command Prompt"`
-    + ` --appendCommandLine " /k ${command}"`;
-
+export async function execInteractiveCommand(command) {
   const options = {
-    shell: true,
-    detached: true,
+    windowsHide: false,
     windowsVerbatimArguments: true,
-    stdio: "ignore"
+    detached: false,
+    stdio: ["inherit", "inherit", "inherit"]
   };
 
-  spawn(fullCommand, options);
+  return Bun.spawn({ cmd: ["cmd", "/C", command], ...options });
 }

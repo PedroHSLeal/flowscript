@@ -1,13 +1,13 @@
 import { $ } from "bun";
 import { confirm } from "@inquirer/prompts";
-import { execInteractiveAndTtyCommand, useDockerfile } from "../../utils";
+import { execInteractiveCommand, useDockerfile } from "../../utils";
 
 const { checkIfDockerfileExists } = useDockerfile();
 
 $.nothrow();
 $.cwd(import.meta.dir);
 
-process.on("message", async (flags) => {
+process.on("message", async function (flags) {
   if (!flags.cwd) return;
 
   let appName = "opencode";
@@ -35,7 +35,9 @@ process.on("message", async (flags) => {
     + ` --mount type=bind,src=${flags.cwd},dst=/home`
     + ` ${appName}`;
 
-  await execInteractiveAndTtyCommand("opencode", command);
+  const subProc = await execInteractiveCommand(command);
+  await subProc.exited;
 
+  return;
 });
 
