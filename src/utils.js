@@ -44,25 +44,26 @@ export function useDockerfile() {
   }
 }
 
-export function usePodmanMachine() {
-  async function execScriptFile(shFile, isQuiet = true) {
+export function usePodman() {
+  async function checkIfArtifactExists(artifact, shortcut) {
+    const artifactList = await $`podman ${artifact} list`.text();
+    return artifactList.includes(shortcut);
+  }
+
+  async function execScriptFileInMachine(shFile, isQuiet = true) {
     let inlineCommands = shFile.split("\n").map(l => l.trim()).filter(l => l.length > 0).filter(l => !l.startsWith("#")).join(" ");
     return $`podman machine ssh '${inlineCommands}'`.quiet(isQuiet);
   }
 
-  async function execInlineCommand(command, isQuiet = true) {
+  async function execInlineCommandInMachine(command, isQuiet = true) {
     return $`podman machine ssh '${command}'`.quiet(isQuiet);
   }
 
   return {
-    execScriptFile,
-    execInlineCommand
+    checkIfArtifactExists,
+    execScriptFileInMachine,
+    execInlineCommandInMachine
   }
-}
-
-export async function checkIfArtifactExists(artifact, shortcut) {
-  const artifactList = await $`podman ${artifact} list`.text();
-  return artifactList.includes(shortcut);
 }
 
 export function args(flags) {
