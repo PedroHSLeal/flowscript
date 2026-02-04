@@ -1,10 +1,9 @@
 import { $ } from "bun";
-import { args, checkIfArtifactExists, useDockerHub, usePodmanMachine } from "../utils";
+import { args, usePodman } from "../utils";
 
 import shEntrypoint from "./ssh-entrypoint.sh" with { type: "text" };
 
-const { fetchDockerHubImageRegistry, selectRegistry, pullImageFromDockerHub } = useDockerHub();
-const { execScriptFile } = usePodmanMachine();
+const { execScriptFileInMachine } = usePodman();
 
 await main();
 
@@ -22,21 +21,11 @@ async function main() {
   }
 
   await checkIfPodmanIsOn();
-
-  const containerExists = await checkIfArtifactExists("image", values.shortcut);
-
-  if (!containerExists) {
-    const data = await fetchDockerHubImageRegistry(values.shortcut);
-    const imageName = await selectRegistry(data.ids);
-
-    await pullImageFromDockerHub(imageName);
-  }
-
-  await execScriptFile(shEntrypoint);
+  await execScriptFileInMachine(shEntrypoint);
 
   execute(values).then(async () => {
     const subprocess = Bun.spawn(["bun", `${process.cwd()}\\src\\shortcuts\\${values.shortcut}\\index.mjs`], {
-      ipc: (message, subprocess, handle) => {},
+      ipc: (message, subprocess, handle) => { },
       detached: false,
       stdio: ["inherit", "inherit", "inherit"]
     });
