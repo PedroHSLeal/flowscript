@@ -10,6 +10,9 @@ $.cwd(import.meta.dir);
 process.on("message", async function (flags) {
   if (!flags.cwd) return;
 
+  const isImageDownloaded = checkIfArtifactExists("image", "ghcr.io/anomalyco/opencode");
+  if (!isImageDownloaded) await $`podman pull ghcr.io/anomalyco/opencode`;
+
   let appName = "opencode";
 
   if (flags.dockerfile) {
