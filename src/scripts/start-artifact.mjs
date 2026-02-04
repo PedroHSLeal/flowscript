@@ -34,11 +34,9 @@ async function main() {
 
   await execScriptFile(shEntrypoint);
 
-  execute(values).then(() => {
+  execute(values).then(async () => {
     const subprocess = Bun.spawn(["bun", `${process.cwd()}\\src\\shortcuts\\${values.shortcut}\\index.mjs`], {
-      ipc: (message, subprocess, handle) => {
-      },
-      // windowsHide: true,
+      ipc: (message, subprocess, handle) => {},
       detached: false,
       stdio: ["inherit", "inherit", "inherit"]
     });
@@ -59,8 +57,7 @@ async function execute({ shortcut, dockerfile }) {
   const outputList = await $`ls -l $(pwd)\\src\\shortcuts`.text();
 
   if (!outputList.includes(shortcut)) {
-    console.log(`o shortcut '${shortcut}' nao existe :(`);
-    console.log(`vou criar agora!`);
+    console.log(`o shortcut '${shortcut}' nao existe :(... vou criar agora!`);
 
     await $`mkdir $(pwd)\\src\\shortcuts\\${shortcut}`;
     await $`touch $(pwd)\\src\\shortcuts\\${shortcut}\\index.mjs`;
