@@ -7,13 +7,14 @@ const { checkIfDockerfileExists } = useDockerfile();
 $.nothrow();
 $.cwd(import.meta.dir);
 
-process.on("message", async (message) => {
-  if (!message.cwd) return;
+process.on("message", async (flags) => {
+  if (!flags.cwd) return;
 
   let appName = "opencode";
 
-  if (message.dockerfile) {
+  if (flags.dockerfile) {
     const dockerfileExists = await checkIfDockerfileExists(`${import.meta.dir}\\Dockerfile`);
+    appName = "irezin/opencode";
 
     if (dockerfileExists) {
       const answerToEdit = await confirm({ message: "quer editar o Dockerfile?: " });
@@ -22,8 +23,6 @@ process.on("message", async (message) => {
       const answerToBuild = await confirm({ message: "quer buildar o Dockerfile?: " });
       if (answerToBuild) {
         await $`podman build --tag irezin/opencode .`;
-
-        appName = "irezin/opencode";
       }
     }
   }
@@ -33,7 +32,7 @@ process.on("message", async (message) => {
     + " --interactive"
     + " --tty"
     + " --network intelligence"
-    + ` --mount type=bind,src=${message.cwd},dst=/home`
+    + ` --mount type=bind,src=${flags.cwd},dst=/home`
     + ` ${appName}`;
 
   await execInteractiveAndTtyCommand("opencode", command);
