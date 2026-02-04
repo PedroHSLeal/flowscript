@@ -1,8 +1,9 @@
 import { $ } from "bun";
 import { confirm } from "@inquirer/prompts";
-import { execInteractiveCommand, useDockerfile } from "../../utils";
+import { execInteractiveCommand, useDockerfile, usePodman } from "../../utils";
 
 const { checkIfDockerfileExists } = useDockerfile();
+const { checkIfArtifactExists } = usePodman();
 
 $.nothrow();
 $.cwd(import.meta.dir);

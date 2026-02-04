@@ -1,5 +1,7 @@
 import { $ } from "bun";
-import { checkIfArtifactExists } from "../../utils";
+import { usePodman } from "../../utils";
+
+const { checkIfArtifactExists } = usePodman();
 
 $.nothrow();
 $.cwd(import.meta.dir);
@@ -21,5 +23,7 @@ process.on("message", async (flags) => {
 
   if (exitCode !== 0) {
     await $`podman container start ollama`;
-  } process.disconnect();
+  }
+
+  process.disconnect();
 });
