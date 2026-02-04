@@ -43,6 +43,8 @@ async function checkIfPodmanIsOn() {
   } catch (err) {
     await $`podman machine start`.quiet();
   }
+
+  console.log("Podman VM está de pé!");
 }
 
 async function execute({ shortcut, dockerfile }) {
