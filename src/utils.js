@@ -1,6 +1,5 @@
 import { $ } from "bun";
 import { parseArgs } from "util";
-import { select } from "@inquirer/prompts";
 
 export function useDockerfile() {
   async function checkIfDockerfileExists(filePath) {
@@ -54,4 +53,8 @@ export async function execInteractiveCommand(command) {
   };
 
   return Bun.spawn({ cmd: ["cmd", "/C", command], ...options });
+}
+
+export async function openInEditor(cwd) {
+  await $`code --wait .`.cwd(cwd);
 }

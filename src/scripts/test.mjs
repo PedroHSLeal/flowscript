@@ -13,3 +13,6 @@ const { values, tokens } = args({
 const {values: otherValues } = args({ "bare-metal": { type: "string" } });
 
 console.log(otherValues);
+
+// await openInEditor(values.cwd);
+// await $`nvim .`.cwd(values.cwd);
