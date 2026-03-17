@@ -7,9 +7,10 @@ $.nothrow();
 $.cwd(import.meta.dir);
 
 process.on("message", async function ({ flags, argv }) {
-  let appName = "opencode";
-
   if (!flags.cwd) return;
+
+  let appName = "opencode";
+  let containerName = `opencode__${flags.cwd.substring(flags.cwd.lastIndexOf("\\") + 1, flags.cwd.length)}`;
 
   if (!checkIfArtifactExists("image", "ghcr.io/anomalyco/opencode"))
     await $`podman pull ghcr.io/anomalyco/opencode`;
@@ -27,8 +28,10 @@ process.on("message", async function ({ flags, argv }) {
     + " --interactive"
     + " --tty"
     + " --env OPENCODE_CONFIG=/opencode/opencode.json"
+    + ` --env OPENROUTER_API_KEY=${process.env.OPENROUTER_API_KEY}`
     + " --network intelligence"
     + ` --mount type=bind,src=${flags.cwd},dst=/playground`
+    + ` --name ${containerName}`
     + ` ${appName}`;
 
   const subProc = await execInteractiveCommand(command);
@@ -36,4 +39,3 @@ process.on("message", async function ({ flags, argv }) {
 
   process.disconnect();
 });
-
