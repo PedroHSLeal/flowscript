@@ -6,12 +6,11 @@ const { checkIfArtifactExists } = usePodman();
 $.nothrow();
 $.cwd(import.meta.dir);
 
-process.on("message", async (flags) => {
-  const isImageDownloaded = checkIfArtifactExists("image", "ghcr.io/anomalyco/opencode");
-  if (!isImageDownloaded) await $`podman pull ghcr.io/open-webui/open-webui:main`
+process.on("message", async () => {
+  if (!checkIfArtifactExists("image", "ghcr.io/anomalyco/opencode"))
+    await $`podman pull ghcr.io/open-webui/open-webui:main`
 
-  const containerRunning = checkIfArtifactExists("container", "open-webui");
-  if (!containerRunning) return;
+  if (!checkIfArtifactExists("container", "open-webui")) return;
 
   const args = " --detach"
     + " --volume open-webui:/app/backend/data"

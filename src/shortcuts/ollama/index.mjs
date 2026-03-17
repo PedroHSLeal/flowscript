@@ -6,9 +6,8 @@ const { checkIfArtifactExists } = usePodman();
 $.nothrow();
 $.cwd(import.meta.dir);
 
-process.on("message", async (flags) => {
-  const containerRunning = checkIfArtifactExists("container", "ollama");
-  if (!containerRunning) return;
+process.on("message", async () => {
+  if (!checkIfArtifactExists("container", "ollama")) return;
 
   const args = " --detach"
     + " --gpus all"
