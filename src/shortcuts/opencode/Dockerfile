@@ -1,8 +1,8 @@
 FROM anomalyco/opencode
 
-COPY opencode.json ./
+COPY opencode.json ./opencode/
 
-WORKDIR /home
+WORKDIR /playground
 
 # just for tests
 # RUN apk add curl
