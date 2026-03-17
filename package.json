@@ -7,8 +7,8 @@
     "start": "bun run src/scripts/start-artifact.mjs",
     "exec": "bun run src/scripts/exec-artifact.mjs",
     "delete": "bun run src/scripts/delete-artifact.mjs",
-    "kabum": "bun run src/scripts/delete-artifact.mjs --all",
-    "morte": "bun run src/scripts/kill-artifact.mjs",
+    "delete-all": "bun run src/scripts/delete-artifact.mjs --all",
+    "kill-all": "bun run src/scripts/kill-artifact.mjs",
     "test": "bun run src/scripts/test.mjs"
   },
   "devDependencies": {
