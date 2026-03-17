@@ -34,9 +34,9 @@ export function usePodman() {
   }
 }
 
-export function args(flags) {
+export function args(flags, args = Bun.argv) {
   return parseArgs({
-    args: Bun.argv,
+    args,
     options: flags,
     strict: false,
     allowNegative: true,

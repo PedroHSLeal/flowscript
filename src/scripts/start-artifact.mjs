@@ -8,15 +8,17 @@ const { execScriptFileInMachine } = usePodman();
 await main();
 
 async function main() {
-  const { values } = args({
+  const argv = Bun.argv;
+
+  const { values, tokens } = args({
     shortcut: { type: "string", short: "s" },
     dockerfile: { type: "boolean", short: "d" },
-    edit: { type: "boolean" },
+    edit: { type: "boolean", short: "e" },
     cwd: { type: "string" }
-  });
+  }, argv);
 
   if (!values.shortcut) {
-    console.log("--shortcut é obrigatório");
+    console.log("(--shortcut | -s) é obrigatório");
     return;
   }
 
@@ -30,7 +32,7 @@ async function main() {
       stdio: ["inherit", "inherit", "inherit"]
     });
 
-    subprocess.send(values);
+    subprocess.send({ flags: values, argv });
     await subprocess.exited;
 
     subprocess.disconnect();
@@ -42,12 +44,11 @@ async function checkIfPodmanIsOn() {
     await $`podman ps`.quiet();
   } catch (err) {
     await $`podman machine start`.quiet();
+    console.log("Podman VM está de pé!");
   }
-
-  console.log("Podman VM está de pé!");
 }
 
-async function execute({ shortcut, dockerfile }) {
+async function execute({ shortcut }) {
   const outputList = await $`ls -l $(pwd)\\src\\shortcuts`.text();
 
   if (!outputList.includes(shortcut)) {
@@ -55,8 +56,6 @@ async function execute({ shortcut, dockerfile }) {
 
     await $`mkdir $(pwd)\\src\\shortcuts\\${shortcut}`;
     await $`touch $(pwd)\\src\\shortcuts\\${shortcut}\\index.mjs`;
-
-    if (dockerfile)
-      await $`touch $(pwd)\\src\\shortcuts\\${shortcut}\\Dockerfile`;
+    await $`touch $(pwd)\\src\\shortcuts\\${shortcut}\\Dockerfile`;
   }
 }
