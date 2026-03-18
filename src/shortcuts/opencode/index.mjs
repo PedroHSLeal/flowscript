@@ -20,7 +20,7 @@ process.on("message", async function ({ flags, argv }) {
 
   if (flags.dockerfile) {
     appName = "irezin/opencode";
-    await $`podman build --tag irezin/opencode .`;
+    await $`podman build --tag irezin/opencode .`.quiet();
   }
 
   const command = "podman"
@@ -36,6 +36,9 @@ process.on("message", async function ({ flags, argv }) {
 
   const subProc = await execInteractiveCommand(command);
   await subProc.exited;
+
+  // await $`podman container kill ${containerName}`;
+  await $`podman container rm ${containerName}`;
 
   process.disconnect();
 });

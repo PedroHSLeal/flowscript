@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "ollama/qwen3-vl:4b",
+  "model": "ollama/granite4:350m",
   "enabled_providers": [
     "ollama",
     "openrouter"
@@ -17,12 +17,12 @@
         "baseURL": "http://ollama:11434/v1"
       },
       "models": {
-        "ministral-3:8b": {
-          "name": "Ministral 3 (8B)"
-        },
-        "qwen3-vl:4b": {
-          "name": "Qwen 3 (vl-4B)"
-        }
+        "ministral-3:8b": { "name": "Ministral 3 (8B)" },
+        "ministral-3:3b": { "name": "Ministral 3 (3B)" },
+        "qwen3-vl:4b": { "name": "Qwen 3 (vl-4B)" },
+        "qwen3.5:4b": { "name": "Qwen 3.5 (4B)" },
+        "granite4:350m": { "name": "Granite 4 (350M)" },
+        "lfm2.5-thinking:latest": { "name": "LFM 2.5" },
       }
     },
     "openrouter": {
