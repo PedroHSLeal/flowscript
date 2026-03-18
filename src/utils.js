@@ -33,19 +33,27 @@ export function usePodman() {
   }
 }
 
-export function args(flags, args = Bun.argv) {
+export function args(flags, options = {}, args = Bun.argv) {
+  let restOptions = {
+    ... {
+      strict: false,
+      allownegative: true,
+      allowpositionals: true,
+      tokens: true
+    },
+    ...options
+  };
+
   return parseArgs({
     args,
     options: flags,
-    strict: false,
-    allowNegative: true,
-    allowPositionals: true,
-    tokens: true
+    ...restOptions
   });
 }
 
-export async function execInteractiveCommand(command) {
+export async function execInteractiveCommand(command, envs = {}) {
   const options = {
+    env: envs,
     windowsHide: false,
     windowsVerbatimArguments: true,
     detached: false,
