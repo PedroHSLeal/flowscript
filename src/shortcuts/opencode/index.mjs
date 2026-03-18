@@ -9,36 +9,48 @@ $.cwd(import.meta.dir);
 process.on("message", async function ({ flags, argv }) {
   if (!flags.cwd) return;
 
-  let appName = "opencode";
-  let containerName = `opencode__${flags.cwd.substring(flags.cwd.lastIndexOf("\\") + 1, flags.cwd.length)}`;
+  let { values: { "bare-metal": bareMetal } } = args({ "bare-metal": { type: "boolean" } }, {}, argv);
 
-  if (!checkIfArtifactExists("image", "ghcr.io/anomalyco/opencode"))
-    await $`podman pull ghcr.io/anomalyco/opencode`;
+  if (bareMetal) {
+    const envKeys = {
+      OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+      OPENCODE_CONFIG_CONTENT: await Bun.file(`${import.meta.dir}/opencode.json`).text()
+    };
 
-  if (flags.edit)
-    await openInEditor(import.meta.dir);
-
-  if (flags.dockerfile) {
-    appName = "irezin/opencode";
-    await $`podman build --tag irezin/opencode .`.quiet();
+    const subProc = await execInteractiveCommand("opencode", envKeys);
+    await subProc.exited;
   }
+  else {
+    let appName = "opencode";
+    let containerName = `opencode__${flags.cwd.substring(flags.cwd.lastIndexOf("\\") + 1, flags.cwd.length)}`;
 
-  const command = "podman"
-    + " run"
-    + " --interactive"
-    + " --tty"
-    + " --env OPENCODE_CONFIG=/opencode/opencode.json"
-    + ` --env OPENROUTER_API_KEY=${process.env.OPENROUTER_API_KEY}`
-    + " --network intelligence"
-    + ` --mount type=bind,src=${flags.cwd},dst=/playground`
-    + ` --name ${containerName}`
-    + ` ${appName}`;
+    if (!checkIfArtifactExists("image", "ghcr.io/anomalyco/opencode"))
+      await $`podman pull ghcr.io/anomalyco/opencode`;
 
-  const subProc = await execInteractiveCommand(command);
-  await subProc.exited;
+    if (flags.edit)
+      await openInEditor(import.meta.dir);
 
-  // await $`podman container kill ${containerName}`;
-  await $`podman container rm ${containerName}`;
+    if (flags.dockerfile) {
+      appName = "irezin/opencode";
+      await $`podman build --tag irezin/opencode .`.quiet();
+    }
+
+    const command = "podman"
+      + " run"
+      + " --interactive"
+      + " --tty"
+      + " --env OPENCODE_CONFIG=/opencode/opencode.json"
+      + ` --env OPENROUTER_API_KEY=${process.env.OPENROUTER_API_KEY}`
+      + " --network intelligence"
+      + ` --mount type=bind,src=${flags.cwd},dst=/playground`
+      + ` --name ${containerName}`
+      + ` ${appName}`;
+
+    const subProc = await execInteractiveCommand(command, envKeys);
+    await subProc.exited;
+
+    await $`podman container rm ${containerName}`;
+  }
 
   process.disconnect();
 });
