@@ -9,7 +9,7 @@
     "delete": "bun run src/scripts/delete-artifact.mjs",
     "delete-all": "bun run src/scripts/delete-artifact.mjs --all",
     "kill-all": "bun run src/scripts/kill-artifact.mjs",
-    "test": "bun run src/scripts/test.mjs"
+    "test": "bun run src/scripts/playground/test.mjs"
   },
   "devDependencies": {
     "@types/bun": "latest"
