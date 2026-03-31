@@ -51,14 +51,15 @@ export function args(flags, options = {}, args = Bun.argv) {
   });
 }
 
-export async function execInteractiveCommand(command, envs = {}) {
+export function execInteractiveCommand(command, envs = {}) {
   const options = {
-    env: envs,
     windowsHide: false,
     windowsVerbatimArguments: true,
     detached: false,
     stdio: ["inherit", "inherit", "inherit"]
   };
+
+  if (!!(Object.keys(envs))) options.env = envs;
 
   return Bun.spawn({ cmd: ["cmd", "/C", command], ...options });
 }
