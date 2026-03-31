@@ -22,7 +22,7 @@ process.on("message", async ({ flags, argv }) => {
       break;
   }
 
-  await execInteractiveCommand(command);
+  execInteractiveCommand([command]);
 
   process.disconnect();
 });
