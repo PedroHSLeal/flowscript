@@ -1,12 +1,7 @@
-FROM anomalyco/opencode
+FROM ubuntu:26.04
 
-COPY opencode.json ./opencode/
-
-WORKDIR /playground
-
-# just for tests
-# RUN apk add curl
-
-# ENTRYPOINT ["/bin/sh"]
-
-ENTRYPOINT ["opencode"]
+RUN apt update -y
+RUN apt install -y curl
+RUN apt install -y git
+RUN curl https://mise.run | sh
+RUN curl -fsSL https://opencode.ai/install | bash
