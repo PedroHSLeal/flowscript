@@ -24,19 +24,15 @@ async function main() {
 
   await checkIfPodmanIsOn();
   await execScriptFileInMachine(shEntrypoint);
+  await execute(values);
 
-  execute(values).then(async () => {
-    const subprocess = Bun.spawn(["bun", `${process.cwd()}\\src\\shortcuts\\${values.shortcut}\\index.mjs`], {
-      ipc: (message, subprocess, handle) => { },
-      detached: false,
-      stdio: ["inherit", "inherit", "inherit"]
-    });
+  const exists = await Bun.file(`${process.cwd()}\\src\\shortcuts\\${values.shortcut}\\index.mjs`).exists();
 
-    subprocess.send({ flags: values, argv });
-    await subprocess.exited;
-
-    subprocess.disconnect();
-  });
+  if (exists) await startSubprocess(values, argv);
+  else {
+    const { default: main } = await import(`${process.cwd()}\\src\\shortcuts\\${values.shortcut}\\main.mjs`);
+    await main(values, argv);
+  }
 }
 
 async function checkIfPodmanIsOn() {
@@ -58,4 +54,17 @@ async function execute({ shortcut }) {
     await $`touch $(pwd)\\src\\shortcuts\\${shortcut}\\index.mjs`;
     await $`touch $(pwd)\\src\\shortcuts\\${shortcut}\\Dockerfile`;
   }
+}
+
+async function startSubprocess(values, argv) {
+  const subprocess = Bun.spawn(["bun", `${process.cwd()}\\src\\shortcuts\\${values.shortcut}\\index.mjs`], {
+    ipc: (message, subprocess, handle) => { },
+    detached: false,
+    stdio: ["inherit", "inherit", "inherit"]
+  });
+
+  subprocess.send({ flags: values, argv });
+  await subprocess.exited;
+
+  subprocess.disconnect();
 }
