@@ -1,23 +1,21 @@
 {
   "name": "dockerzin",
   "module": "index.mjs",
-  "type": "module",
-  "private": true,
-  "scripts": {
-    "start": "bun run src/scripts/start-artifact.mjs",
-    "exec": "bun run src/scripts/exec-artifact.mjs",
-    "delete": "bun run src/scripts/delete-artifact.mjs",
-    "delete-all": "bun run src/scripts/delete-artifact.mjs --all",
-    "kill-all": "bun run src/scripts/kill-artifact.mjs",
-    "test": "bun run src/scripts/playground/test.mjs"
-  },
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
-  "dependencies": {
-    "@inquirer/prompts": "^8.2.0"
-  }
+  "private": true,
+  "scripts": {
+    "start": "bun run src/scripts/start-artifact.mjs",
+    "create": "bun run src/scripts/create-artifact.mjs",
+    "exec": "bun run src/scripts/exec-artifact.mjs",
+    "delete": "bun run src/scripts/delete-artifact.mjs",
+    "delete-all": "bun run src/scripts/delete-artifact.mjs --all",
+    "kill-all": "bun run src/scripts/kill-artifact.mjs",
+    "test": "bun run src/scripts/playground/test.mjs"
+  },
+  "type": "module"
 }
