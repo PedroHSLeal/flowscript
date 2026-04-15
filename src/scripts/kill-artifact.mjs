@@ -1,5 +1,4 @@
 import { $ } from "bun";
-import { args } from "../utils";
 
 $.nothrow();
 
