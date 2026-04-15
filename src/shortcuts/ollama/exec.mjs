@@ -7,22 +7,25 @@ $.nothrow();
 $.cwd(import.meta.dir);
 
 process.on("message", async ({ flags, argv }) => {
-  if (!checkIfArtifactExists("container", "ollama")) return;
-
-  let { values: otherValues } = args({
-    action: { type: "string", short: "a" },
-    model: { type: "string", short: "m" }
-  }, argv);
+  let { action } = args({ action: { type: "string", short: "a" } }, {}, argv);
 
   let command = "";
 
-  switch( otherValues.action) {
-    case "pull":
-      command = `podman exec -it ollama ollama pull ${otherValues.model}`;
+  switch (action) {
+    case "install":
+      let { model } = args({ model: { type: "string", short: "m" } }, {}, argv);
+      command = `podman exec -it ollama ollama pull ${model}`;
+      break;
+    case "install-models":
+      const models = await $`cat models.txt`.text();
+      command = `podman exec -it ollama ollama pull ${models.split("\n").join(" ")}`;
+      break;
+    case "list":
+      command = `podman exec -it ollama ollama ls`;
       break;
   }
 
-  execInteractiveCommand([command]);
+  execInteractiveCommand(command);
 
   process.disconnect();
 });
