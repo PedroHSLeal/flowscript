@@ -1,7 +1,7 @@
 import { $ } from "bun";
-import { usePodman } from "../../utils";
+import { usePodmanCLI } from "../../utils";
 
-const { checkIfArtifactExists, checkRunningContainers } = usePodman();
+const { checkIfArtifactExists } = usePodmanCLI();
 
 // $.nothrow();
 $.cwd(import.meta.dir);

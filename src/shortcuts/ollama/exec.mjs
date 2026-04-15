@@ -1,7 +1,6 @@
 import { $ } from "bun";
-import { args, execInteractiveCommand, usePodman } from "../../utils";
+import { args, execInteractiveCommand } from "../../utils";
 
-const { checkIfArtifactExists } = usePodman();
 
 $.nothrow();
 $.cwd(import.meta.dir);

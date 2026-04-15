@@ -1,16 +1,16 @@
 import { $ } from "bun";
-import { usePodman } from "../../utils";
+import { usePodmanCLI } from "../../utils";
 
-const { checkIfArtifactExists } = usePodman();
+const { checkIfArtifactExists } = usePodmanCLI();
 
 $.nothrow();
 $.cwd(import.meta.dir);
 
 process.on("message", async () => {
-  if (!checkIfArtifactExists("image", "ghcr.io/anomalyco/opencode"))
+  if (!checkIfArtifactExists("image", false, "ghcr.io/anomalyco/opencode"))
     await $`podman pull ghcr.io/open-webui/open-webui:main`
 
-  if (!checkIfArtifactExists("container", "open-webui")) return;
+  if (!checkIfArtifactExists("container", false, "open-webui")) return;
 
   const args = " --detach"
     + " --volume open-webui:/app/backend/data"
