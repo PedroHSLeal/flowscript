@@ -1,20 +1,18 @@
 import { $ } from "bun";
 import { args, usePodman } from "../utils";
 
-const { execScriptFileInMachine } = usePodman();
-
 await main();
 
 async function main() {
   const argv = Bun.argv;
 
   const { values } = args({
-    shortcut: { type: "string", short: "s" },
+    artifact: { type: "string", short: "a" },
     cwd: { type: "string" }
   }, argv);
 
   if (!values.shortcut) {
-    console.log("(--shortcut | -s) é obrigatório");
+    console.log("(--artifact | -a) é obrigatório");
     return;
   }
 
