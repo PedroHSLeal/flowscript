@@ -1,9 +1,9 @@
 import { $ } from "bun";
-import { args, usePodman } from "../utils";
+import { args, usePodmanCLI } from "../utils";
 
 import shEntrypoint from "./ssh-entrypoint.sh" with { type: "text" };
 
-const { execScriptFileInMachine } = usePodman();
+const { execScriptFileInMachine } = usePodmanCLI();
 
 await main();
 

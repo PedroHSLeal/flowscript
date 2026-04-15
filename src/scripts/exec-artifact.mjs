@@ -1,5 +1,5 @@
 import { $ } from "bun";
-import { args, usePodman } from "../utils";
+import { args } from "../utils";
 
 await main();
 
