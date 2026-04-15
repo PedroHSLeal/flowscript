@@ -49,7 +49,6 @@ import { args, id, openInEditor, usePowershell } from "../../utils";
 //     const p = exec([`Start-Process \"cmd.exe\" -ArgumentList \"/C rd ${linkPath}\"`], { windowsVerbatimArguments: false });
 //     await p.exited;
 //   }
-
 //   async function checkIfLinkExists(linkPath, basePath) {
 //     const p = await $`ls -l`.cwd(basePath).text();
 //     console.log(p);
@@ -63,5 +62,15 @@ import { args, id, openInEditor, usePowershell } from "../../utils";
 //   }
 // }
 
-console.log(btoa("C:\\Users\\henri\\fun\\shenanigans\\alguma-coisa"))
-console.log(atob("QzpcVXNlcnNcaGVucmlcZnVuXHNoZW5hbmlnYW5zXGFsZ3VtYS1jb2lzYQ=="))
+// console.log(btoa("C:\\Users\\henri\\fun\\shenanigans\\alguma-coisa"))
+// console.log(atob("QzpcVXNlcnNcaGVucmlcZnVuXHNoZW5hbmlnYW5zXGFsZ3VtYS1jb2lzYQ=="))
+
+// let hash = Bun.hash("C:\\Users\\henri\\fun\\shenanigans\\alguma-coisa");
+// console.log(hash)
+
+// const cryptoHash = new Bun.CryptoHasher("md5");
+// let hash = cryptoHash.update("C:\\Users\\henri\\fun\\shenanigans\\alguma-coisa\\alguma-coisa--2");
+// console.log(hash.digest("hex"));
+
+console.log(import.meta.dir);
+console.log(import.meta.dir.substring(0, import.meta.dir.lastIndexOf("\\")));
