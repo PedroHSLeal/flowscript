@@ -5,6 +5,7 @@ export * from "./podman";
 export * from "./shell-code";
 export * from "./uuid";
 export * from "./symbolic-link";
+export * from "./pretty-print";
 
 export function args(flags, options = {}, args = Bun.argv) {
   let restOptions = {
