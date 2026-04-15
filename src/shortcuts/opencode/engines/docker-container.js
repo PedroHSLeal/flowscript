@@ -1,38 +1,35 @@
 import { $ } from "bun";
-import { getFolderName, hash, useCmd, usePodmanCLI, symbolinkLinkOps } from "../../../utils";
+import { prettyPrint, useCmd, usePodmanCLI } from "../../../utils";
 import { manageContainers } from "../utils";
 
 const { checkIfArtifactExists } = usePodmanCLI();
 const { exec: cmdExec } = useCmd();
-const { addLink } = symbolinkLinkOps();
 
 export async function runInContainer(flags) {
-  await $`mkdir opencode`.cwd("C:\\Users\\henri\\fun\\shenanigans").quiet().nothrow();
-
-  const folderName = getFolderName(flags.cwd);
-  const opencodeSrc = "C:\\Users\\henri\\fun\\shenanigans\\opencode";
   const basePath = import.meta.dir.substring(0, import.meta.dir.lastIndexOf("\\"));
 
   await checkContainerRequirements(basePath);
 
   const containerRegistry = manageContainers(basePath);
-  const registryDb = await containerRegistry.read();
 
-  let uniqueFolderID = null;
-  if (await containerRegistry.exists(registryDb, flags.cwd)) {
-    uniqueFolderID = await containerRegistry.get(registryDb, flags.cwd).id;
+  if (await containerRegistry.exists(flags.cwd)) {
+    console.log(prettyPrint("O container já existe :)"));
   }
   else {
-    uniqueFolderID = hash(flags.cwd);
-    await addLink(`${opencodeSrc}\\${uniqueFolderID}`, flags.cwd);
-  }
+    let containerID = await containerRegistry.set(flags.cwd);
 
-  await containerRegistry.register(registryDb, uniqueFolderID, flags.cwd, folderName);
+    let args = [
+      "--interactive",
+      "--tty",
+      "--env OPENCODE_CONFIG=/opencode/opencode.json",
+      `--env OPENROUTER_API_KEY=${process.env.OPENROUTER_API_KEY}`,
+      "--network intelligence",
+      `--mount type=bind,src=${flags.cwd},dst=/playground`,
+      `--name ${containerID}`
+    ];
 
-  await startNewContainer(opencodeSrc);
-
-  if (await checkIfArtifactExists("container", false, "custom-opencode")) {
-    await attachNewProcess();
+    const proc = cmdExec([`podman run ${args.join(" ")} custom-opencode /bin/bash`]);
+    await proc.exited;
   }
 }
 
@@ -43,25 +40,4 @@ async function checkContainerRequirements(basePath) {
     await $`podman build --tag custom-opencode .`.cwd(basePath);
   if (!(await checkIfArtifactExists("network", false, "intelligence")))
     await $`podman network create intelligence`;
-}
-
-async function startNewContainer(opencodeSrc) {
-  let args = [
-    "--detach",
-    "--interactive",
-    "--tty",
-    "--env OPENCODE_CONFIG=/opencode/opencode.json",
-    `--env OPENROUTER_API_KEY=${process.env.OPENROUTER_API_KEY}`,
-    "--network intelligence",
-    `--mount type=bind,src=${opencodeSrc},dst=/playground`,
-    `--name custom-opencode`
-  ];
-
-  const proc = cmdExec([`podman run ${args.join(" ")} custom-opencode /bin/bash`]);
-  await proc.exited;
-}
-
-async function attachNewProcess() {
-  const execContainer = cmdExec([`podman exec --interactive --tty custom-opencode /bin/bash`]);
-  await execContainer.exited;
 }
