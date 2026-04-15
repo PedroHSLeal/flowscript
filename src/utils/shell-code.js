@@ -24,9 +24,6 @@ export function usePowershell() {
       stdio: ["inherit", "inherit", "inherit"]
     };
 
-    console.log(opts);
-    console.log(mergeObjects(options, opts));
-
     return Bun.spawn({ cmd: ["powershell.exe", ...commands], ...mergeObjects(options, opts) });
   }
 

@@ -1,9 +1,14 @@
 import { $ } from "bun";
 
-export function usePodman() {
-  async function checkIfArtifactExists(artifact, shortcut) {
-    const artifactList = await $`podman ${artifact} list`.text();
+export function usePodmanCLI() {
+  async function checkIfArtifactExists(artifact, listAll, shortcut) {
+    const artifactList = await $`podman ${artifact} list ${listAll ? "--all" : ""}`.text();
     return artifactList.includes(shortcut);
+  }
+
+  async function checkRunningContainers(shortcut) {
+    const runningContainers = await $`podman ps`.text();
+    return runningContainers.includes(shortcut);
   }
 
   async function execScriptFileInMachine(shFile, isQuiet = true) {
@@ -17,6 +22,7 @@ export function usePodman() {
 
   return {
     checkIfArtifactExists,
+    checkRunningContainers,
     execScriptFileInMachine,
     execInlineCommandInMachine
   }

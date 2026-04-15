@@ -3,3 +3,8 @@ let nanoid = (e = 21) => { let t = "", r = crypto.getRandomValues(new Uint8Array
 export function id() {
   return nanoid();
 }
+
+const cryptoHash = new Bun.CryptoHasher("md5")
+export function hash(data) {
+  return cryptoHash.update(data).digest("hex");
+}

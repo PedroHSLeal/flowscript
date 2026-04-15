@@ -1,10 +1,10 @@
 import { $ } from "bun";
 import { parseArgs } from "util";
 
-export * from "./docker";
 export * from "./podman";
 export * from "./shell-code";
 export * from "./uuid";
+export * from "./symbolic-link";
 
 export function args(flags, options = {}, args = Bun.argv) {
   let restOptions = {
@@ -27,7 +27,7 @@ export function args(flags, options = {}, args = Bun.argv) {
   else return result;
 }
 
-export function getLastFolderName(path) {
+export function getFolderName(path) {
   return path
     .substring(path.lastIndexOf("\\") + 1, path.length)
     .replace(/[\-]/g, "_");
