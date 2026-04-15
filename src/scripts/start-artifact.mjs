@@ -10,29 +10,28 @@ await main();
 async function main() {
   const argv = Bun.argv;
 
-  const { values, tokens } = args({
-    shortcut: { type: "string", short: "s" },
-    dockerfile: { type: "boolean", short: "d" },
-    edit: { type: "boolean", short: "e" },
+  const flags = args({
+    artifact: { type: "string", short: "a" },
     cwd: { type: "string" }
-  }, argv);
+  }, {}, argv);
 
-  if (!values.shortcut) {
-    console.log("(--shortcut | -s) é obrigatório");
+  if (!flags.artifact) {
+    console.log("(--artifact | -a) é obrigatório");
     return;
   }
 
   await checkIfPodmanIsOn();
-  await execScriptFileInMachine(shEntrypoint);
-  await execute(values);
+  await execScriptFileInMachine(shEntrypoint, true);
 
-  const exists = await Bun.file(`${process.cwd()}\\src\\shortcuts\\${values.shortcut}\\index.mjs`).exists();
+  const exists = await Bun.file(`${process.cwd()}\\src\\shortcuts\\${flags.artifact}\\index.mjs`).exists();
 
-  if (exists) await startSubprocess(values, argv);
-  else {
-    const { default: main } = await import(`${process.cwd()}\\src\\shortcuts\\${values.shortcut}\\main.mjs`);
-    await main(values, argv);
+  if (exists) {
+    const { default: main } = await import(`${process.cwd()}\\src\\shortcuts\\${flags.artifact}\\index.mjs`);
+
+    if (main) await main(flags, argv);
+    else await startSubprocess(flags, argv)
   }
+  else console.log(`O artifact ${flags.artifact} nao existe :(`);
 }
 
 async function checkIfPodmanIsOn() {
@@ -40,30 +39,19 @@ async function checkIfPodmanIsOn() {
     await $`podman ps`.quiet();
   } catch (err) {
     await $`podman machine start`.quiet();
-    console.log("Podman VM está de pé!");
   }
+
+  console.log("Podman VM está de pé!");
 }
 
-async function execute({ shortcut }) {
-  const outputList = await $`ls -l $(pwd)\\src\\shortcuts`.text();
-
-  if (!outputList.includes(shortcut)) {
-    console.log(`o shortcut '${shortcut}' nao existe :(... vou criar agora!`);
-
-    await $`mkdir $(pwd)\\src\\shortcuts\\${shortcut}`;
-    await $`touch $(pwd)\\src\\shortcuts\\${shortcut}\\index.mjs`;
-    await $`touch $(pwd)\\src\\shortcuts\\${shortcut}\\Dockerfile`;
-  }
-}
-
-async function startSubprocess(values, argv) {
-  const subprocess = Bun.spawn(["bun", `${process.cwd()}\\src\\shortcuts\\${values.shortcut}\\index.mjs`], {
+async function startSubprocess(flags, argv) {
+  const subprocess = Bun.spawn(["bun", `${process.cwd()}\\src\\shortcuts\\${flags.artifact}\\index.mjs`], {
     ipc: (message, subprocess, handle) => { },
     detached: false,
     stdio: ["inherit", "inherit", "inherit"]
   });
 
-  subprocess.send({ flags: values, argv });
+  subprocess.send({ flags, argv });
   await subprocess.exited;
 
   subprocess.disconnect();
