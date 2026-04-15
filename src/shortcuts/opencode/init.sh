@@ -1,6 +1,7 @@
 apt update -y
 apt install -y curl
 apt install -y git
+apt install -y gcc
 
 install -dm 755 /etc/apt/keyrings
 
@@ -17,6 +18,7 @@ echo >> /root/.bashrc
 echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)"' >> /root/.bashrc
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)"
 
-curl -fsSL https://opencode.ai/install | bash
+# curl -fsSL https://opencode.ai/install | bash
+mise use -g github:anomalyco/opencode
 
 brew install asdf
