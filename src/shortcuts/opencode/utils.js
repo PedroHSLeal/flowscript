@@ -1,6 +1,6 @@
 export function manageContainers(path) {
   let _db = null;
-  const filePath = `${path}\\running-instances.txt`;
+  const filePath = `${path}\\running-instances.db.txt`;
   const HEADER = "FULL_PATH,CONTAINER_ID\n";
 
   async function __exists() {
