@@ -8,10 +8,10 @@ $.cwd(import.meta.dir);
 
 process.on("message", async function ({ flags, argv }) {
   if (flags.cwd) {
-    let { "bare-metal": bareMetal } = args({ "bare-metal": { type: "boolean" } }, {}, argv);
+    let { "bare-metal": bareMetal, single } = args({ "bare-metal": { type: "boolean" }, single: { type: "boolean" } }, {}, argv);
 
     if (bareMetal) await runInBareMetal(flags);
-    else await runInContainer(flags);
+    else await runInContainer(flags, single);
   }
 
   process.disconnect();
