@@ -18,7 +18,6 @@ echo >> /root/.bashrc
 echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)"' >> /root/.bashrc
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)"
 
-# curl -fsSL https://opencode.ai/install | bash
-mise use -g github:anomalyco/opencode
+curl -fsSL https://opencode.ai/install | bash
 
 brew install asdf
