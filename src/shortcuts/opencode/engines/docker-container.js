@@ -14,7 +14,7 @@ export async function runInContainer(flags, singleMode) {
 
   let containerID = null;
   if (singleMode) {
-    containerID = "custom-opencode";
+    containerID = "ire-opencode";
     const fun = "C:\\Users\\henri\\fun";
 
     if (fun === flags.cwd) {
@@ -34,12 +34,13 @@ export async function runInContainer(flags, singleMode) {
       `--name ${containerID}`
     ];
 
+
     if (await checkIfArtifactExists("container", true, containerID)) {
-      const startProc = cmdExec(["podman start custom-opencode"]);
+      const startProc = cmdExec([`podman start ${containerID}`]);
       await startProc.exited;
     }
     else {
-      const runProc = cmdExec([`podman run ${args.join(" ")} ${containerID}`]);
+      const runProc = cmdExec([`podman run ${args.join(" ")} custom-opencode`]);
       await runProc.exited;
     }
 
