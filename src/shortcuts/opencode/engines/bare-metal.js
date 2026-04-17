@@ -7,7 +7,7 @@ export async function runInBareMetal(flags) {
 
   const envKeys = {
     OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
-    OPENCODE_CONFIG_CONTENT: configFile.replace("http://ollama", "http://localhost")
+    OPENCODE_CONFIG_CONTENT: configFile.replace("http://custom-ollama", "http://localhost")
   };
 
   const subProc = cmdExec([`cd ${flags.cwd} && opencode`], { env: envKeys });
