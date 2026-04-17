@@ -20,9 +20,10 @@ process.on("message", async () => {
 
   if (!(await checkIfArtifactExists("network", false, "intelligence"))) await $`podman network create intelligence`;
   if (!(await checkIfArtifactExists("image", false, "ollama"))) await $`podman pull docker.io/ollama/ollama`;
-
-  const command = `podman run ${args.join(" ")} ollama`;
-  await $`${{ raw: command }}`;
+  if (!(await checkIfArtifactExists("container", false, "custom-ollama"))) {
+    const command = `podman run ${args.join(" ")} ollama`;
+    await $`${{ raw: command }}`;
+  }
 
   process.disconnect();
 });
