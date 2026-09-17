@@ -5,17 +5,16 @@ import { join, sep } from "node:path";
 const DEFAULT_WORKFLOW_PATH = join(homedir(), ".config", "flowscript", "workflows");
 const CWD_WORKFLOW_PATH = join(process.cwd(), ".flowscript", "workflows");
 
-let workflow: string;
-
-if (Bun.argv.length == 3) {
-  if (Bun.argv[2] == "--list-workflows")
-    await listWorkflows();
+if (Bun.argv.length == 3 && Bun.argv[2] == "--list-workflows") {
+  await listWorkflows();
 }
-else if (Bun.argv.length > 3) {
-  const cmd = Bun.argv.slice(Bun.argv[2] == "--bun-be-bun" ? 3 : 2);
-  cmd[0] = await chooseWorkflowLocation(cmd[0]!)
-  await startBunBeBun(cmd);
-
+else {
+  if (Bun.argv[2] == "--bun-be-bun")
+    await startBunBeBun(Bun.argv.slice(3));
+  else await startBunBeBun([
+    await chooseWorkflowLocation(Bun.argv[2] as string),
+    ...Bun.argv.slice(3)
+  ]);
 }
 
 async function startBunBeBun(cmd: string[]): Promise<void> {
