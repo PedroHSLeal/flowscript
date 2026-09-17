@@ -1,34 +1,63 @@
-import { join } from "node:path";
-import { getUserConfig } from "./src/utils/user-configs";
-import { parseArgs } from "node:util";
+import { glob } from "node:fs/promises";
+import { homedir } from "node:os";
+import { join, sep } from "node:path";
 
-const { values } = parseArgs({
-  args: Bun.argv,
-  options: {
-    cwd: { type: "boolean", default: false }
+const DEFAULT_WORKFLOW_PATH = join(homedir(), ".config", "flowscript", "workflows");
+const CWD_WORKFLOW_PATH = join(process.cwd(), ".flowscript", "workflows");
+
+let workflow: string;
+
+if (Bun.argv.length == 3) {
+  if (Bun.argv[2] == "--list-workflows")
+    await listWorkflows();
+}
+else if (Bun.argv.length > 3) {
+  const cmd = Bun.argv.slice(Bun.argv[2] == "--bun-be-bun" ? 3 : 2);
+  cmd[0] = await chooseWorkflowLocation(cmd[0]!)
+  await startBunBeBun(cmd);
+
+}
+
+async function startBunBeBun(cmd: string[]): Promise<void> {
+  const subprocess = Bun.spawn({
+    cmd: [process.execPath, ...cmd],
+    env: { BUN_BE_BUN: "1", ...process.env },
+    lazy: true,
+    detached: false,
+    windowsHide: true,
+    windowsVerbatimArguments: false,
+    stdio: ["inherit", "inherit", "inherit"]
+  });
+
+  await subprocess.exited;
+}
+
+async function chooseWorkflowLocation(workflow: string) {
+  const defaultPath = join(DEFAULT_WORKFLOW_PATH, workflow, "index.mjs");
+  const defaultExists = await Bun.file(defaultPath).exists();
+  const cwdPath = join(CWD_WORKFLOW_PATH, workflow, "index.mjs");
+  const cwdExists = await Bun.file(cwdPath).exists();
+
+  if (!cwdExists && !defaultExists) {
+    console.error(`Workflow '${workflow}' does not exist :(`);
+    await listWorkflows();
+    process.exit(0);
   }
-})
 
-const entrypoint = Bun.argv[2];
+  return cwdPath && defaultPath;
+}
 
-await startWorkflow(entrypoint);
+async function listWorkflows() {
+  async function list(path: string) {
+    const workflows = [];
 
-async function startWorkflow(workflow: string | undefined) {
-  if (!workflow) {
-    console.error(`the workflow prop is required`);
-    return;
+    for await (const element of glob("**/index.mjs", { cwd: path, exclude: ["**/node_modules/**"] })) {
+      workflows.push(element.split(sep)[0]);
+      console.log(path + sep + element);
+    }
+
+    return workflows;
   }
 
-  const { pathToWorkflowFolder } = await getUserConfig();
-  const path = join(values.cwd ? process.cwd() : pathToWorkflowFolder, workflow, "index.mjs");
-  const exists = await Bun.file(path).exists();
-
-  if (!exists) {
-    console.log(`Workflow '${workflow}' does not exist :(`);
-    return;
-  }
-
-  const { default: program } = await import(path);
-
-  await program(Bun.argv);
+  return new Set([...await list(DEFAULT_WORKFLOW_PATH), ...await list(CWD_WORKFLOW_PATH)]);
 }
