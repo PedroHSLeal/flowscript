@@ -5,16 +5,18 @@ A ~~dumb, error-prune, gibbirish~~ simple way to carry a js runtime in a usb dri
 ## How to use
 
 ```bash
-flowscript
 # spawn a new custom terminal
+flowscript
 
-flowscript --list-workflows
 # list all the workflows scripts that you have
+flowscript --list-workflows
 
-flowscript editor ...args
-# $(pwd)/.flowscript/workflows/editor/index.mjs ...args
-## ~/.config/flowscript/workflows/editor/index.mjs ...args
+# execute a workflow, considering these locations
+# $(pwd)/.flowscript/workflows/editor/index.mjs
+## ~/.config/flowscript/workflows/editor/index.mjs
+flowscript ...bun-flags --workflow editor ...args
 
-flowscript --bun-be-bun ...args
-# set BUN_BE_BUN=1 flowscript ...args
+# execute it as bun's CLI
+# set BUN_BE_BUN=1 flowscript ...bun-args
+flowscript --bun-be-bun ...bun-args
 ```
