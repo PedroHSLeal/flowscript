@@ -1,6 +1,6 @@
 # flowscript
 
-A ~~dumb, error-prune, gibbirish~~ simple way to carry a js runtime in a usb drive and execute js/ts from Bun.js
+A ~~dumb, error-prune, gibberish~~ simple way to carry a js runtime in a USB and execute ts from Bun.js
 
 ## How to use
 
