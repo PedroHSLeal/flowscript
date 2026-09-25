@@ -1,21 +1,17 @@
 {
-  "name": "dockerzin",
+  "name": "flowscript",
   "module": "index.mjs",
-  "devDependencies": {
-    "@types/bun": "latest"
+  "type": "module",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "bun scripts/build.ts",
+    "build-local": "bun scripts/build.local.ts"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
-  "private": true,
-  "scripts": {
-    "start": "bun run src/scripts/start-artifact.mjs",
-    "create": "bun run src/scripts/create-artifact.mjs",
-    "exec": "bun run src/scripts/exec-artifact.mjs",
-    "delete": "bun run src/scripts/delete-artifact.mjs",
-    "delete-all": "bun run src/scripts/delete-artifact.mjs --all",
-    "kill-all": "bun run src/scripts/kill-artifact.mjs",
-    "test": "bun run src/scripts/playground/test.mjs"
-  },
-  "type": "module"
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
 }

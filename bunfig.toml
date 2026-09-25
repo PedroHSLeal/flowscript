@@ -2,3 +2,6 @@ smol = true
 
 [run]
 shell = "system"
+
+[install]
+auto = true
