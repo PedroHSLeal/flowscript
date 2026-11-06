@@ -6,14 +6,19 @@ A ~~dumb, error-prune, gibberish~~ simple way to carry a js runtime in a USB and
 
 ```bash
 # list all the workflows scripts that you have
-flowscript --list-workflows
+flowscript --fs-list
 
 # execute a workflow, considering these locations
 # $(pwd)/.flowscript/workflows/editor/index.mjs
 ## ~/.config/flowscript/workflows/editor/index.mjs
-flowscript ...bun-flags --workflow editor ...args
+flowscript ...bun-flags --fs-workflow editor ...args
 
-# execute it as bun's CLI
+# pick a workflow (global or local) and cd into its folder
+# with a name, only the workflows with that name are listed
+# (needs the shell function below)
+flowscript --fs-goto
+flowscript --fs-goto editor
+
+# without any --fs- flag, it behaves as bun's CLI
 # set BUN_BE_BUN=1 flowscript ...bun-args
-flowscript --bun-be-bun ...bun-args
-```
+flowscript ...bun-args
