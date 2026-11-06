@@ -1,18 +1,28 @@
 import { glob } from "node:fs/promises";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { join, sep } from "node:path";
 
 const DEFAULT_WORKFLOW_PATH = join(homedir(), ".config", "flowscript", "workflows");
 const CWD_WORKFLOW_PATH = join(process.cwd(), ".flowscript", "workflows");
 
-if (Bun.argv.length == 3 && Bun.argv[2] == "--list-workflows") {
-  await listWorkflows();
-}
-else {
-  if (Bun.argv[2] == "--bun-be-bun") {
+const ENTRYPOINT = Bun.argv[2];
+
+switch (ENTRYPOINT) {
+  case "--bun-be-bun":
     await startBunBeBun(Bun.argv.slice(3));
-  }
-  else if (Bun.argv.includes("--workflow")) {
+    break;
+  case "--list-workflows":
+    const workflows = await listWorkflows();
+
+    console.log(`### Global workflows (${workflows.global.length}):`);
+    workflows.global.forEach(w => console.log(`${DEFAULT_WORKFLOW_PATH}${sep}${w}`));
+
+    console.log("");
+
+    console.log(`### Local workflows (${workflows.local.length}):`);
+    workflows.local.forEach(w => console.log(`${CWD_WORKFLOW_PATH}${sep}${w}`));
+    break;
+  default:
     const indexOfWorkflow = Bun.argv.indexOf("--workflow");
     const workflow = Bun.argv[indexOfWorkflow + 1] as string;
 
@@ -21,25 +31,14 @@ else {
 
     const workflowLocation = await chooseWorkflowLocation(workflow);
 
-    /* if (!bunArgs.includes("--cwd")) {
-      bunArgs.push("--cwd");
-      bunArgs.push(workflowLocation.replace(`${sep}${workflow}${sep}index.mjs`, ""));
-    } */
-
-    /* bunArgs = bunArgs.reduce((prev: any[], curr: string) => {
-      if (curr.startsWith("--")) prev.push([curr]);
-      else prev[prev.length - 1] = `${prev[prev.length - 1]}=${curr}`;
-      return prev;
-    }, []); */
-
     await startBunBeBun([
       ...bunArgs,
       workflowLocation,
       ...workflowArgs
     ]);
-  }
+    break;
 }
-
+  
 async function startBunBeBun(cmds: string[]): Promise<void> {
   const subprocess = Bun.spawn({
     cmd: [process.execPath, ...cmds],
@@ -65,9 +64,10 @@ async function chooseWorkflowLocation(workflow: string) {
     const workflows = await listWorkflows();
 
     console.error(`Workflow '${workflow}' does not exist :(`);
-    console.log(`you have ${workflows.length} workflows:`);
+    console.log(`you have ${workflows.global.length + workflows.local.length} workflows:`);
 
-    workflows.forEach(w => console.log("- " + w));
+    workflows.global.forEach(w => console.log("- " + w));
+    workflows.local.forEach(w => console.log("- " + w));
 
     process.exit(0);
   }
@@ -86,5 +86,5 @@ async function listWorkflows() {
     return workflows;
   }
 
-  return [...await list(DEFAULT_WORKFLOW_PATH), ...await list(CWD_WORKFLOW_PATH)];
+  return { global: await list(DEFAULT_WORKFLOW_PATH), local: await list(CWD_WORKFLOW_PATH) };
 }
