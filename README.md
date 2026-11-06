@@ -8,9 +8,6 @@ A ~~dumb, error-prune, gibberish~~ simple way to carry a js runtime in a USB and
 # list all the workflows scripts that you have
 flowscript --list-workflows
 
-# create a new workflow
-flowscript --new-workflow
-
 # execute a workflow, considering these locations
 # $(pwd)/.flowscript/workflows/editor/index.mjs
 ## ~/.config/flowscript/workflows/editor/index.mjs
