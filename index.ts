@@ -86,7 +86,8 @@ async function startBunBeBun(cmds: string[]): Promise<void> {
     stdio: ["inherit", "inherit", "inherit"]
   });
 
-  await subprocess.exited;
+  // exit with the same code as bun/the workflow, so failures reach the caller
+  process.exitCode = await subprocess.exited;
 }
 
 async function chooseWorkflowLocation(workflow: string) {
@@ -99,12 +100,12 @@ async function chooseWorkflowLocation(workflow: string) {
     const workflows = await listWorkflows();
 
     console.error(`Workflow '${workflow}' does not exist :(`);
-    console.log(`you have ${workflows.global.length + workflows.local.length} workflows:`);
+    console.error(`you have ${workflows.global.length + workflows.local.length} workflows:`);
 
-    workflows.global.forEach(w => console.log("- " + WORKFLOW_SIGIL + dirname(w)));
-    workflows.local.forEach(w => console.log("- " + WORKFLOW_SIGIL + dirname(w)));
+    workflows.global.forEach(w => console.error("- " + WORKFLOW_SIGIL + dirname(w)));
+    workflows.local.forEach(w => console.error("- " + WORKFLOW_SIGIL + dirname(w)));
 
-    process.exit(0);
+    process.exit(1);
   }
 
   return cwdExists ? cwdPath : defaultPath;
