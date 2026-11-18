@@ -1,77 +1,77 @@
 import { glob } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join, sep } from "node:path";
+import { helpText, parseArgs, WORKFLOW_SIGIL } from "./cli";
 import { select, type SelectOption } from "./select";
 
 const DEFAULT_WORKFLOW_PATH = join(homedir(), ".config", "flowscript", "workflows");
 const CWD_WORKFLOW_PATH = join(process.cwd(), ".flowscript", "workflows");
 
-const ARGV = Bun.argv.slice(2);
-const INDEX_OF_FS_FLAG = ARGV.findIndex(arg => arg.startsWith("--fs-"));
-const FS_FLAG = ARGV[INDEX_OF_FS_FLAG];
+const invocation = parseArgs(Bun.argv.slice(2));
 
-switch (FS_FLAG) {
-  case undefined:
-    await startBunBeBun(ARGV);
+switch (invocation.kind) {
+  case "bun":
+    await startBunBeBun(invocation.args);
     break;
-  case "--fs-list":
-    const workflows = await listWorkflows();
 
-    console.log(`### Global workflows (${workflows.global.length}):`);
-    workflows.global.forEach(w => console.log(`${DEFAULT_WORKFLOW_PATH}${sep}${w}`));
-
-    console.log("");
-
-    console.log(`### Local workflows (${workflows.local.length}):`);
-    workflows.local.forEach(w => console.log(`${CWD_WORKFLOW_PATH}${sep}${w}`));
-    break;
-  case "--fs-workflow":
-    const workflow = ARGV[INDEX_OF_FS_FLAG + 1];
-
-    if (!workflow) {
-      console.error("Missing workflow name after --fs-workflow");
-      process.exit(1);
-    }
-
-    const bunArgs = ARGV.slice(0, INDEX_OF_FS_FLAG);
-    const workflowArgs = ARGV.slice(INDEX_OF_FS_FLAG + 2);
-
-    const workflowLocation = await chooseWorkflowLocation(workflow);
-
+  case "workflow":
     await startBunBeBun([
-      ...bunArgs,
-      workflowLocation,
-      ...workflowArgs
+      ...invocation.bunArgs,
+      await chooseWorkflowLocation(invocation.name),
+      ...invocation.args
     ]);
     break;
-  case "--fs-goto":
-    const name = ARGV[INDEX_OF_FS_FLAG + 1];
-    const { global, local } = await listWorkflows();
 
-    const options: SelectOption<string>[] = [
-      ...global.map(w => ({ scope: "global", name: dirname(w), dir: join(DEFAULT_WORKFLOW_PATH, dirname(w)) })),
-      ...local.map(w => ({ scope: "local ", name: dirname(w), dir: join(CWD_WORKFLOW_PATH, dirname(w)) }))
-    ]
-      .filter(w => !name || w.name === join(name))
-      .map(w => ({ label: `${w.scope}  ${w.name}`, value: w.dir }));
-
-    if (options.length === 0) {
-      console.error(name ? `Workflow '${name}' does not exist :(` : "You don't have any workflows :(");
-      process.exit(1);
+  case "command":
+    switch (invocation.name) {
+      case "list": await listCommand(); break;
+      case "goto": await gotoCommand(invocation.args[0]); break;
+      case "help": console.log(helpText()); break;
     }
-
-    const target = options.length === 1
-      ? options[0]!.value
-      : await select(name ? `Where is '${name}'?` : "Go to which workflow?", options);
-
-    if (!target) process.exit(1);
-
-    console.log(target);
     break;
 
-  default:
-    console.error(`Unknown flowscript flag '${FS_FLAG}'. Available: --fs-list, --fs-workflow, --fs-goto`);
+  case "error":
+    console.error(invocation.message);
     process.exit(1);
+}
+
+async function listCommand() {
+  const workflows = await listWorkflows();
+
+  console.log(`### Global workflows (${workflows.global.length}):`);
+  workflows.global.forEach(w => console.log(`${DEFAULT_WORKFLOW_PATH}${sep}${w}`));
+
+  console.log("");
+
+  console.log(`### Local workflows (${workflows.local.length}):`);
+  workflows.local.forEach(w => console.log(`${CWD_WORKFLOW_PATH}${sep}${w}`));
+}
+
+async function gotoCommand(name?: string) {
+  // accept both `:goto editor` and `:goto @editor`
+  if (name?.startsWith(WORKFLOW_SIGIL)) name = name.slice(WORKFLOW_SIGIL.length);
+
+  const { global, local } = await listWorkflows();
+
+  const options: SelectOption<string>[] = [
+    ...global.map(w => ({ scope: "global", name: dirname(w), dir: join(DEFAULT_WORKFLOW_PATH, dirname(w)) })),
+    ...local.map(w => ({ scope: "local ", name: dirname(w), dir: join(CWD_WORKFLOW_PATH, dirname(w)) }))
+  ]
+    .filter(w => !name || w.name === join(name))
+    .map(w => ({ label: `${w.scope}  ${w.name}`, value: w.dir }));
+
+  if (options.length === 0) {
+    console.error(name ? `Workflow '${name}' does not exist :(` : "You don't have any workflows :(");
+    process.exit(1);
+  }
+
+  const target = options.length === 1
+    ? options[0]!.value
+    : await select(name ? `Where is '${name}'?` : "Go to which workflow?", options);
+
+  if (!target) process.exit(1);
+
+  console.log(target);
 }
 
 async function startBunBeBun(cmds: string[]): Promise<void> {
@@ -101,8 +101,8 @@ async function chooseWorkflowLocation(workflow: string) {
     console.error(`Workflow '${workflow}' does not exist :(`);
     console.log(`you have ${workflows.global.length + workflows.local.length} workflows:`);
 
-    workflows.global.forEach(w => console.log("- " + w));
-    workflows.local.forEach(w => console.log("- " + w));
+    workflows.global.forEach(w => console.log("- " + WORKFLOW_SIGIL + dirname(w)));
+    workflows.local.forEach(w => console.log("- " + WORKFLOW_SIGIL + dirname(w)));
 
     process.exit(0);
   }
