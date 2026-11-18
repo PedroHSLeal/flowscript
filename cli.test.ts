@@ -15,6 +15,8 @@ describe("parseArgs", () => {
       ["--smol", "run", "script.ts", "@arg"],
       ["--preload", "@scope/pkg", "script.ts"],
       ["--", "@editor"],
+      ["-", "@editor"],
+      ["--drop", "@editor", "script.ts"],
     ]) {
       expect(parseArgs(argv)).toEqual({ kind: "bun", args: argv });
     }

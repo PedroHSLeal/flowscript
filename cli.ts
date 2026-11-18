@@ -27,19 +27,24 @@ export type Invocation =
 
 // bun runtime flags that take their value as the next argument (`--flag value`)
 // the value must be skipped, otherwise `--preload @scope/pkg` would look like a workflow
-// keep in sync with docs/bun-flags.md
+// taken from the "Global / runtime flags" table of docs/bun-flags.md (bun 1.4.4), keep in sync
+// --inspect, --inspect-wait and --inspect-brk are left out on purpose: their value is optional
+// and bun only reads it when attached with `=`
 export const BUN_FLAGS_WITH_VALUE = new Set([
   "-r", "--preload", "--require", "--import",
   "-e", "--eval", "-p", "--print",
   "-c", "--config",
+  "-d", "--define",
+  "-l", "--loader",
+  "-F", "--filter",
   "--cwd",
   "--env-file",
   "--conditions",
   "--main-fields",
   "--extension-order",
   "--tsconfig-override",
-  "-d", "--define",
-  "-l", "--loader",
+  "--drop",
+  "--feature",
   "--jsx-factory", "--jsx-fragment", "--jsx-import-source", "--jsx-runtime",
   "--port",
   "--console-depth",
@@ -47,12 +52,17 @@ export const BUN_FLAGS_WITH_VALUE = new Set([
   "--max-http-header-size",
   "--dns-result-order",
   "--unhandled-rejections",
+  "--user-agent",
+  "--redirect-warnings",
+  "--disable-warning",
   "--title",
   "--install",
   "--shell",
   "--elide-lines",
-  "--filter", "-F",
-  "--workspaces",
+  "--watch-kill-signal",
+  "--cpu-prof-name", "--cpu-prof-dir", "--cpu-prof-interval",
+  "--heap-prof-name", "--heap-prof-dir", "--heap-prof-interval",
+  "--cron-title", "--cron-period",
 ]);
 
 export function parseArgs(argv: string[]): Invocation {
@@ -61,7 +71,8 @@ export function parseArgs(argv: string[]): Invocation {
   while (i < argv.length) {
     const arg = argv[i]!;
 
-    if (arg === "--") break;
+    // `--` ends the flags and a lone `-` makes bun read the program from stdin
+    if (arg === "--" || arg === "-") break;
 
     if (arg.startsWith("-")) {
       i += BUN_FLAGS_WITH_VALUE.has(arg) ? 2 : 1;
