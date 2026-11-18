@@ -9,30 +9,29 @@ describe("parseArgs", () => {
   test("plain bun calls pass through untouched", () => {
     for (const argv of [
       ["run", "dev"],
-      ["script.ts", "---list", "---workflow", "x"],
+      ["script.ts", "---workflow", "x"],
       ["add", "@types/node"],
-      ["x", "@biomejs/biome", "check"],
-      ["--smol", "run", "script.ts", "---list"],
-      ["--eval", "---list", "script.ts"],
-      ["--", "---list"],
-      ["-", "---list"],
+      ["--smol", "run", "script.ts", "---run", "list"],
+      ["--eval", "---run", "script.ts"],
+      ["--", "---workflow", "list"],
+      ["-", "---workflow", "list"],
     ]) {
       expect(parseArgs(argv)).toEqual({ kind: "bun", args: argv });
     }
   });
 
   test("runs a workflow", () => {
-    expect(parseArgs(["---workflow", "editor"])).toEqual({ kind: "workflow", name: "editor", bunArgs: [], args: [] });
-    expect(parseArgs(["---workflow=editor"])).toEqual({ kind: "workflow", name: "editor", bunArgs: [], args: [] });
+    expect(parseArgs(["---workflow", "list"])).toEqual({ kind: "workflow", name: "list", bunArgs: [], args: [] });
+    expect(parseArgs(["---workflow=goto", "editor"])).toEqual({ kind: "workflow", name: "goto", bunArgs: [], args: ["editor"] });
     expect(parseArgs(["---run", "tools/fmt"])).toEqual({ kind: "workflow", name: "tools/fmt", bunArgs: [], args: [] });
   });
 
   test("workflow keeps bun flags before it and args after it", () => {
-    expect(parseArgs(["--smol", "--watch", "---workflow", "editor", "a", "--b", "---list"])).toEqual({
+    expect(parseArgs(["--smol", "--watch", "---workflow", "editor", "a", "--b", "---run"])).toEqual({
       kind: "workflow",
       name: "editor",
       bunArgs: ["--smol", "--watch"],
-      args: ["a", "--b", "---list"],
+      args: ["a", "--b", "---run"],
     });
   });
 
@@ -51,21 +50,9 @@ describe("parseArgs", () => {
     expect(parseArgs(["---workflow="]).kind).toBe("error");
   });
 
-  test("commands and aliases", () => {
-    expect(parseArgs(["---list"])).toEqual({ kind: "command", name: "list", args: [] });
-    expect(parseArgs(["---ls"])).toEqual({ kind: "command", name: "list", args: [] });
-    expect(parseArgs(["---goto", "editor"])).toEqual({ kind: "command", name: "goto", args: ["editor"] });
-    expect(parseArgs(["---goto=editor"])).toEqual({ kind: "command", name: "goto", args: ["editor"] });
-    expect(parseArgs(["---cd"])).toEqual({ kind: "command", name: "goto", args: [] });
-    expect(parseArgs(["---help"])).toEqual({ kind: "command", name: "help", args: [] });
-  });
-
-  test("unknown --- flags are an error instead of reaching bun", () => {
-    expect(parseArgs(["---nope"]).kind).toBe("error");
-    expect(parseArgs(["---"]).kind).toBe("error");
-  });
-
-  test("commands other than ---workflow must come first", () => {
-    expect(parseArgs(["--smol", "---list"]).kind).toBe("error");
+  test("the old flags and unknown --- flags are an error instead of reaching bun", () => {
+    for (const flag of ["---list", "---goto", "---help", "---nope", "---"]) {
+      expect(parseArgs([flag]).kind).toBe("error");
+    }
   });
 });
