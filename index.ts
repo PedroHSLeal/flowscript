@@ -1,7 +1,7 @@
 import { glob } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join, sep } from "node:path";
-import { helpText, parseArgs, WORKFLOW_SIGIL } from "./cli";
+import { helpText, parseArgs } from "./cli";
 import { select, type SelectOption } from "./select";
 
 const DEFAULT_WORKFLOW_PATH = join(homedir(), ".config", "flowscript", "workflows");
@@ -48,9 +48,6 @@ async function listCommand() {
 }
 
 async function gotoCommand(name?: string) {
-  // accept both `:goto editor` and `:goto @editor`
-  if (name?.startsWith(WORKFLOW_SIGIL)) name = name.slice(WORKFLOW_SIGIL.length);
-
   const { global, local } = await listWorkflows();
 
   const options: SelectOption<string>[] = [
@@ -102,8 +99,8 @@ async function chooseWorkflowLocation(workflow: string) {
     console.error(`Workflow '${workflow}' does not exist :(`);
     console.error(`you have ${workflows.global.length + workflows.local.length} workflows:`);
 
-    workflows.global.forEach(w => console.error("- " + WORKFLOW_SIGIL + dirname(w)));
-    workflows.local.forEach(w => console.error("- " + WORKFLOW_SIGIL + dirname(w)));
+    workflows.global.forEach(w => console.error("- " + dirname(w)));
+    workflows.local.forEach(w => console.error("- " + dirname(w)));
 
     process.exit(1);
   }
